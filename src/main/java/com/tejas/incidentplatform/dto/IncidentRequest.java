@@ -1,5 +1,7 @@
 package com.tejas.incidentplatform.dto;
 
+import com.tejas.incidentplatform.entity.Severity;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
