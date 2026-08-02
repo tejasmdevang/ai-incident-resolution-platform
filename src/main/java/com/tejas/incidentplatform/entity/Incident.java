@@ -2,7 +2,6 @@ package com.tejas.incidentplatform.entity;
 
 import java.time.OffsetDateTime;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,11 +17,9 @@ public class Incident {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
     @Column(nullable = false, length = 150)
     private String title;
 
-    @NotBlank
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 

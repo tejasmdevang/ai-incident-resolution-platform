@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class IncidentRequest {
 
-    @NotNull
+    @NotBlank
     private String title;
 
     @NotBlank
