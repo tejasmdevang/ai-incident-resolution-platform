@@ -1,10 +1,9 @@
 package com.tejas.incidentplatform.service;
 
 import java.time.OffsetDateTime;
-
 import org.springframework.stereotype.Service;
-
 import com.tejas.incidentplatform.dto.IncidentRequest;
+import com.tejas.incidentplatform.dto.IncidentResponse;
 import com.tejas.incidentplatform.entity.Incident;
 import com.tejas.incidentplatform.entity.IncidentStatus;
 import com.tejas.incidentplatform.repository.IncidentRepository;
@@ -20,7 +19,7 @@ public class IncidentService {
         this.incidentRepository = incidentRepository;
     }
 
-    public Incident createIncident(IncidentRequest request) {
+    public IncidentResponse createIncident(IncidentRequest request) {
         OffsetDateTime now = OffsetDateTime.now();
 
         Incident incident = new Incident();
@@ -33,7 +32,23 @@ public class IncidentService {
         incident.setCreatedAt(now);
         incident.setUpdatedAt(now);
 
-        return incidentRepository.save(incident);
+        Incident savedIncident = incidentRepository.save(incident);
+
+        return mapToResponse(savedIncident);
     }
 
+    private IncidentResponse mapToResponse(Incident incident) {
+        IncidentResponse response = new IncidentResponse();
+
+        response.setId(incident.getId());
+        response.setTitle(incident.getTitle());
+        response.setDescription(incident.getDescription());
+        response.setServiceName(incident.getServiceName());
+        response.setSeverity(incident.getSeverity());
+        response.setStatus(incident.getStatus());
+        response.setCreatedAt(incident.getCreatedAt());
+        response.setUpdatedAt(incident.getUpdatedAt());
+
+        return response;
+    }
 }
