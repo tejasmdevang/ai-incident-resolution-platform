@@ -6,6 +6,7 @@ import com.tejas.incidentplatform.dto.IncidentRequest;
 import com.tejas.incidentplatform.dto.IncidentResponse;
 import com.tejas.incidentplatform.entity.Incident;
 import com.tejas.incidentplatform.entity.IncidentStatus;
+import com.tejas.incidentplatform.exception.IncidentNotFoundException;
 import com.tejas.incidentplatform.repository.IncidentRepository;
 
 import java.time.OffsetDateTime;
@@ -50,5 +51,12 @@ public class IncidentService {
         response.setUpdatedAt(incident.getUpdatedAt());
 
         return response;
+    }
+
+    public IncidentResponse getIncidentById(Long id){
+        Incident incident = incidentRepository.findById(id)
+                .orElseThrow(() -> new IncidentNotFoundException(id)); 
+    
+        return mapToResponse(incident);
     }
 }
