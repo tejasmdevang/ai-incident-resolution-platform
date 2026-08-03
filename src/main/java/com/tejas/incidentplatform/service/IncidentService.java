@@ -1,13 +1,22 @@
 package com.tejas.incidentplatform.service;
 
 import java.time.OffsetDateTime;
+
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import com.tejas.incidentplatform.dto.IncidentRequest;
 import com.tejas.incidentplatform.dto.IncidentResponse;
+import com.tejas.incidentplatform.dto.PagedResponse;
 import com.tejas.incidentplatform.entity.Incident;
 import com.tejas.incidentplatform.entity.IncidentStatus;
 import com.tejas.incidentplatform.exception.IncidentNotFoundException;
 import com.tejas.incidentplatform.repository.IncidentRepository;
+import com.tejas.incidentplatform.dto.PagedResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import java.util.*;
 
 import java.time.OffsetDateTime;
 
@@ -59,4 +68,39 @@ public class IncidentService {
     
         return mapToResponse(incident);
     }
+
+    public PagedResponse<IncidentResponse> getAllIncidents(
+        int page,
+        int size,
+        String sortBy,
+        String direction) {
+
+    Sort.Direction sortDirection =
+            direction.equalsIgnoreCase("asc")
+                    ? Sort.Direction.ASC
+                    : Sort.Direction.DESC;
+
+    Pageable pageable = PageRequest.of(
+            page,
+            size,
+            Sort.by(sortDirection, sortBy));
+
+    Page<Incident> incidentPage =
+            incidentRepository.findAll(pageable);
+
+    List<IncidentResponse> responses =
+            incidentPage.getContent()
+                    .stream()
+                    .map(this::mapToResponse)
+                    .toList();
+
+    return new PagedResponse<>(
+            responses,
+            incidentPage.getNumber(),
+            incidentPage.getSize(),
+            incidentPage.getTotalElements(),
+            incidentPage.getTotalPages(),
+            incidentPage.isFirst(),
+            incidentPage.isLast());
+}
 }
