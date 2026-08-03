@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.tejas.incidentplatform.dto.IncidentRequest;
 import com.tejas.incidentplatform.dto.IncidentResponse;
 import com.tejas.incidentplatform.dto.PagedResponse;
+import com.tejas.incidentplatform.dto.UpdateIncidentStatusRequest;
 import com.tejas.incidentplatform.entity.Incident;
 import com.tejas.incidentplatform.entity.IncidentStatus;
 import com.tejas.incidentplatform.exception.IncidentNotFoundException;
@@ -69,6 +70,7 @@ public class IncidentService {
         return mapToResponse(incident);
     }
 
+    //method to get paginated response
     public PagedResponse<IncidentResponse> getAllIncidents(
         int page,
         int size,
@@ -102,5 +104,26 @@ public class IncidentService {
             incidentPage.getTotalPages(),
             incidentPage.isFirst(),
             incidentPage.isLast());
+}
+
+//method to update incident status alone using PATCH request
+
+public IncidentResponse updateStatus(
+        Long id,
+        UpdateIncidentStatusRequest request) {
+
+    Incident incident =
+            incidentRepository.findById(id)
+                    .orElseThrow(() ->
+                            new IncidentNotFoundException(id));
+
+    incident.setStatus(request.getStatus());
+
+    incident.setUpdatedAt(OffsetDateTime.now());
+
+    Incident saved = incidentRepository.save(incident);
+
+    return mapToResponse(saved);
+
 }
 }
