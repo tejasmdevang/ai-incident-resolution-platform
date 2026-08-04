@@ -26,4 +26,18 @@ public class GlobalExceptionHandler {
                     .body(body);
         }
 
+    @ExceptionHandler(InvalidStatusTransitionException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidStatusTransition(
+        InvalidStatusTransitionException exception) {
+
+            Map<String, Object> body = new LinkedHashMap<>();
+            body.put("timestamp", OffsetDateTime.now());
+            body.put("status", HttpStatus.BAD_REQUEST.value());
+            body.put("error", "Bad Request");
+            body.put("message", exception.getMessage());
+
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(body);
+}
 }

@@ -11,7 +11,11 @@ import com.tejas.incidentplatform.dto.UpdateIncidentStatusRequest;
 import com.tejas.incidentplatform.entity.Incident;
 import com.tejas.incidentplatform.entity.IncidentStatus;
 import com.tejas.incidentplatform.exception.IncidentNotFoundException;
+import com.tejas.incidentplatform.exception.InvalidStatusTransitionException;
 import com.tejas.incidentplatform.repository.IncidentRepository;
+
+import jakarta.transaction.Transactional;
+
 import com.tejas.incidentplatform.dto.PagedResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -108,22 +112,56 @@ public class IncidentService {
 
 //method to update incident status alone using PATCH request
 
+@Transactional
 public IncidentResponse updateStatus(
         Long id,
         UpdateIncidentStatusRequest request) {
 
-    Incident incident =
-            incidentRepository.findById(id)
-                    .orElseThrow(() ->
-                            new IncidentNotFoundException(id));
+    Incident incident = incidentRepository.findById(id)
+            .orElseThrow(() -> new IncidentNotFoundException(id));
 
-    incident.setStatus(request.getStatus());
+    IncidentStatus requestedStatus = request.getStatus();
 
+    validateStatusTransition(
+            incident.getStatus(),
+            requestedStatus
+    );
+
+    incident.setStatus(requestedStatus);
     incident.setUpdatedAt(OffsetDateTime.now());
 
-    Incident saved = incidentRepository.save(incident);
-
-    return mapToResponse(saved);
-
+    return mapToResponse(incident);
 }
+
+private void validateStatusTransition(
+        IncidentStatus currentStatus,
+        IncidentStatus requestedStatus) {
+
+    if (currentStatus == requestedStatus) {
+        return;
+    }
+
+    boolean validTransition = switch (currentStatus) {
+        case OPEN ->
+                requestedStatus == IncidentStatus.INVESTIGATING;
+
+        case INVESTIGATING ->
+                requestedStatus == IncidentStatus.MITIGATED;
+
+        case MITIGATED ->
+                requestedStatus == IncidentStatus.RESOLVED;
+
+        case RESOLVED ->
+                false;
+    };
+
+    if (!validTransition) {
+        throw new InvalidStatusTransitionException(
+                currentStatus,
+                requestedStatus
+        );
+    }
+}
+
+
 }
