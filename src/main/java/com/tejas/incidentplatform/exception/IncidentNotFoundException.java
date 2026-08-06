@@ -2,8 +2,7 @@ package com.tejas.incidentplatform.exception;
 
 public class IncidentNotFoundException extends RuntimeException {
 
-    public IncidentNotFoundException(long id){
+    public IncidentNotFoundException(Long id) {
         super("Incident not found with id: " + id);
     }
-
 }

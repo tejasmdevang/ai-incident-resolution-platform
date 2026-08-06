@@ -20,6 +20,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -120,6 +121,36 @@ class IncidentServiceTest {
 
         verify(incidentRepository).findById(99L);
     }
+
+        @Test
+        void shouldDeleteExistingIncident() {
+        Long incidentId = 1L;
+        Incident incident = new Incident();
+        incident.setId(incidentId);
+
+        when(incidentRepository.findById(incidentId))
+                .thenReturn(Optional.of(incident));
+
+        incidentService.deleteIncident(incidentId);
+
+        verify(incidentRepository).findById(incidentId);
+        verify(incidentRepository).delete(incident);
+}
+@Test
+void shouldThrowExceptionWhenDeletingMissingIncident() {
+    Long incidentId = 999L;
+
+    when(incidentRepository.findById(incidentId))
+            .thenReturn(Optional.empty());
+
+    assertThrows(
+            IncidentNotFoundException.class,
+            () -> incidentService.deleteIncident(incidentId)
+    );
+
+    verify(incidentRepository).findById(incidentId);
+    verify(incidentRepository, never()).delete(any());
+}
 
     private Incident createIncident(IncidentStatus status) {
         Incident incident = new Incident();

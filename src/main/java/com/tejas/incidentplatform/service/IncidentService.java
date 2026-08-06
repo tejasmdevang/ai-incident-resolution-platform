@@ -163,5 +163,15 @@ private void validateStatusTransition(
     }
 }
 
+// to delet existing incident
+
+@Transactional
+public void deleteIncident(Long id) {
+    Incident incident = incidentRepository.findById(id)
+            .orElseThrow(() -> new IncidentNotFoundException(id));
+
+    incidentRepository.delete(incident);
+}
+
 
 }

@@ -1,6 +1,7 @@
 package com.tejas.incidentplatform.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -94,6 +95,14 @@ UpdateIncidentStatusRequest request){
 
     );
 
+}
+
+// to delete an existing incident
+
+@DeleteMapping("/{id}")
+public ResponseEntity<Void> deleteIncident(@PathVariable Long id) {
+    incidentService.deleteIncident(id);
+    return ResponseEntity.noContent().build();
 }
 
 
