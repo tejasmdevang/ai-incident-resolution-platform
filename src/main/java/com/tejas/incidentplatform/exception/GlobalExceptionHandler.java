@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -39,5 +41,23 @@ public class GlobalExceptionHandler {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body(body);
+}
+
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<ApiErrorResponse> handleEmailAlreadyExists(
+        EmailAlreadyExistsException exception,
+        HttpServletRequest request) {
+        ApiErrorResponse response = new ApiErrorResponse(
+            OffsetDateTime.now(),
+            HttpStatus.CONFLICT.value(),
+            "Conflict",
+            exception.getMessage(),
+            request.getRequestURI(),
+            null
+        );
+
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(response);
 }
 }
