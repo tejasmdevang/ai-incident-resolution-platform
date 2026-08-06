@@ -1,4 +1,4 @@
-package com.tejas.incident_res_platform;
+package com.tejas.incidentplatform;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
