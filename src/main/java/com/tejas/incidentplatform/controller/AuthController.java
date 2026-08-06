@@ -1,5 +1,7 @@
 package com.tejas.incidentplatform.controller;
 
+import com.tejas.incidentplatform.dto.AuthenticationResponse;
+import com.tejas.incidentplatform.dto.LoginRequest;
 import com.tejas.incidentplatform.dto.RegisterRequest;
 import com.tejas.incidentplatform.service.AuthService;
 import jakarta.validation.Valid;
@@ -29,5 +31,19 @@ public class AuthController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .build();
+    }
+    @PostMapping("/login")
+    public ResponseEntity<AuthenticationResponse> login(
+
+            @Valid
+            @RequestBody
+            LoginRequest request
+
+    ) {
+
+        return ResponseEntity.ok(
+                authService.login(request)
+        );
+
     }
 }
