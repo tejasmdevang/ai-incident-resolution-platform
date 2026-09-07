@@ -33,13 +33,7 @@ public class AuthController {
                 .build();
     }
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> login(
-
-            @Valid
-            @RequestBody
-            LoginRequest request
-
-    ) {
+    public ResponseEntity<AuthenticationResponse> login( @Valid @RequestBody LoginRequest request) {
 
         return ResponseEntity.ok(
                 authService.login(request)

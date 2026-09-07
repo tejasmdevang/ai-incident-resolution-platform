@@ -7,12 +7,17 @@ import com.tejas.incidentplatform.entity.Role;
 import com.tejas.incidentplatform.entity.User;
 import com.tejas.incidentplatform.exception.EmailAlreadyExistsException;
 import com.tejas.incidentplatform.repository.UserRepository;
+import com.tejas.incidentplatform.security.JwtService;
 
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import java.time.OffsetDateTime;
 
 @Service
@@ -20,13 +25,20 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
+
 
     public AuthService(
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            AuthenticationManager authenticationManager,
+            JwtService jwtService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
     }
 
     @Transactional
@@ -54,29 +66,21 @@ public class AuthService {
 @Transactional(readOnly = true)
 public AuthenticationResponse login(LoginRequest request) {
 
+
     String normalizedEmail =
             request.getEmail().trim().toLowerCase();
 
-    User user = userRepository.findByEmail(normalizedEmail)
-            .orElseThrow(() ->
-                    new BadCredentialsException(
-                            "Invalid email or password"
-                    ));
-
-    boolean passwordMatches =
-            passwordEncoder.matches(
-                    request.getPassword(),
-                    user.getPasswordHash()
+            Authentication authentication =
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            normalizedEmail,
+                            request.getPassword()
+                    )
             );
 
-    if (!passwordMatches) {
-        throw new BadCredentialsException(
-                "Invalid email or password"
-        );
-    }
+            String token =
+            jwtService.generateToken(authentication);
 
-    return new AuthenticationResponse(
-            "LOGIN_SUCCESS"
-    );
+    return new AuthenticationResponse(token);
 }
 }
