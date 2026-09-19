@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.tejas.incidentplatform.dto.PagedResponse;
 import com.tejas.incidentplatform.dto.UpdateIncidentStatusRequest;
+import com.tejas.incidentplatform.dto.InvestigationResult;
+import com.tejas.incidentplatform.service.InvestigationService;
 
 
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,10 +21,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.tejas.incidentplatform.dto.IncidentEvidenceRequest;
 import com.tejas.incidentplatform.dto.IncidentRequest;
 import com.tejas.incidentplatform.dto.IncidentResponse;
+import com.tejas.incidentplatform.dto.InvestigationResult;
 import com.tejas.incidentplatform.entity.Incident;
 import com.tejas.incidentplatform.entity.IncidentEvidence;
 import com.tejas.incidentplatform.service.IncidentEvidenceService;
 import com.tejas.incidentplatform.service.IncidentService;
+import com.tejas.incidentplatform.service.InvestigationService;
 
 import io.micrometer.core.ipc.http.HttpSender.Response;
 
@@ -36,10 +40,12 @@ import jakarta.validation.Valid;
 public class IncidentController {
     private final IncidentService incidentService;
     private final IncidentEvidenceService incidentEvidenceService;
+    private final InvestigationService investigationService;
 
-    public IncidentController(IncidentService incidentService, IncidentEvidenceService incidentEvidenceService){
+    public IncidentController(IncidentService incidentService, IncidentEvidenceService incidentEvidenceService, InvestigationService investigationService){
         this.incidentService = incidentService;
         this.incidentEvidenceService = incidentEvidenceService;
+        this.investigationService = investigationService;
 
     }
 
@@ -123,6 +129,17 @@ public ResponseEntity<IncidentEvidence> addEvidence(
     return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(evidence);
+}
+
+@PostMapping("/{incidentId}/analyze")
+public ResponseEntity<InvestigationResult> analyzeIncident(
+        @PathVariable Long incidentId
+) {
+
+    InvestigationResult result =
+            investigationService.analyze(incidentId);
+
+    return ResponseEntity.ok(result);
 }
 
 }
