@@ -57,12 +57,31 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/actuator/health").permitAll()
-                        .requestMatchers(HttpMethod.DELETE,"/api/incidents/**")
-                        .hasRole("ADMIN")
-                        .anyRequest().authenticated()
-                )
+    .requestMatchers("/api/auth/**").permitAll()
+    .requestMatchers("/actuator/health").permitAll()
+
+    .requestMatchers(
+        HttpMethod.DELETE,
+        "/api/incidents/**"
+    ).hasRole("ADMIN")
+
+    .requestMatchers(
+        HttpMethod.PATCH,
+        "/api/incidents/*/status"
+    ).hasAnyRole("ENGINEER", "ADMIN")
+
+    .requestMatchers(
+        HttpMethod.POST,
+        "/api/incidents/*/evidence"
+    ).hasAnyRole("ENGINEER", "ADMIN")
+
+    .requestMatchers(
+        HttpMethod.POST,
+        "/api/incidents/*/agent"
+    ).hasAnyRole("ENGINEER", "ADMIN")
+
+    .anyRequest().authenticated()
+)
 
                 .oauth2ResourceServer(oauth2 ->
         oauth2.jwt(jwt ->

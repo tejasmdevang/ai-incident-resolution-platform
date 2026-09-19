@@ -401,4 +401,35 @@ button:disabled {
     flex-direction: row;
     align-items: center;
   }
+  .auth-switch {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #6b7280;
+  }
+  
+  .auth-switch-button {
+    padding: 0;
+    background: transparent;
+    color: #2563eb;
+    font-weight: 600;
+  }
+  
+  .auth-switch-button:hover:not(:disabled) {
+    background: transparent;
+    color: #1d4ed8;
+  }
+  
+  .auth-success {
+    margin: 4px 0 0;
+    color: #15803d;
+    font-size: 14px;
+  }
+
+
 }

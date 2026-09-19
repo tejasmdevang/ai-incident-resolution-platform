@@ -18,6 +18,10 @@ function App() {
   const [agentResponse, setAgentResponse] = useState("");
   const [agentRunning, setAgentRunning] = useState(false);
 
+  const [isRegistering, setIsRegistering] = useState(false);
+const [name, setName] = useState("");
+const [authMessage, setAuthMessage] = useState("");
+
   // Load incidents after login
   useEffect(() => {
     if (!token) {
@@ -67,6 +71,42 @@ function App() {
       .catch(() => {
         setError("Invalid email or password");
       });
+  }
+
+  async function handleRegister(event) {
+    event.preventDefault();
+  
+    setError("");
+    setAuthMessage("");
+  
+    try {
+      const response = await fetch(
+        "http://localhost:8080/api/auth/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            password,
+          }),
+        }
+      );
+  
+      if (!response.ok) {
+        throw new Error("Registration failed");
+      }
+  
+      setAuthMessage("Account created successfully. Please sign in.");
+      setIsRegistering(false);
+      setName("");
+      setPassword("");
+    } catch (error) {
+      console.error("Registration failed:", error);
+      setError("Unable to create account.");
+    }
   }
 
   // AI investigation
@@ -174,17 +214,36 @@ function App() {
             <h1>AI Incident Resolution Platform</h1>
   
             <p>
-              Sign in to monitor, investigate, and resolve production incidents.
+              {isRegistering
+                ? "Create an account to access the incident response platform."
+                : "Sign in to monitor, investigate, and resolve production incidents."}
             </p>
           </div>
   
-          <form className="login-form" onSubmit={handleLogin}>
+          <form
+            className="login-form"
+            onSubmit={isRegistering ? handleRegister : handleLogin}
+          >
+            {isRegistering && (
+              <>
+                <label>Name</label>
+                <input
+                  type="text"
+                  placeholder="Your name"
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                  required
+                />
+              </>
+            )}
+  
             <label>Email</label>
             <input
               type="email"
               placeholder="you@example.com"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
+              required
             />
   
             <label>Password</label>
@@ -193,12 +252,39 @@ function App() {
               placeholder="Enter your password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
+              required
             />
   
-            <button type="submit">Sign In</button>
+            <button type="submit">
+              {isRegistering ? "Create Account" : "Sign In"}
+            </button>
   
             {error && <p className="login-error">{error}</p>}
+  
+            {authMessage && (
+              <p className="auth-success">{authMessage}</p>
+            )}
           </form>
+  
+          <div className="auth-switch">
+            <span>
+              {isRegistering
+                ? "Already have an account?"
+                : "Don't have an account?"}
+            </span>
+  
+            <button
+              type="button"
+              className="auth-switch-button"
+              onClick={() => {
+                setIsRegistering(!isRegistering);
+                setError("");
+                setAuthMessage("");
+              }}
+            >
+              {isRegistering ? "Sign In" : "Create Account"}
+            </button>
+          </div>
         </div>
       </div>
     );
