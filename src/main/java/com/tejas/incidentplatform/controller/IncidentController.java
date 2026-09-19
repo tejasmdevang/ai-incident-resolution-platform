@@ -14,6 +14,7 @@ import com.tejas.incidentplatform.dto.PagedResponse;
 import com.tejas.incidentplatform.dto.UpdateIncidentStatusRequest;
 import com.tejas.incidentplatform.dto.InvestigationResult;
 import com.tejas.incidentplatform.service.InvestigationService;
+import com.tejas.incidentplatform.ai.IncidentAiClient;
 
 
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,11 +42,13 @@ public class IncidentController {
     private final IncidentService incidentService;
     private final IncidentEvidenceService incidentEvidenceService;
     private final InvestigationService investigationService;
+    private final IncidentAiClient incidentAiClient;
 
-    public IncidentController(IncidentService incidentService, IncidentEvidenceService incidentEvidenceService, InvestigationService investigationService){
+    public IncidentController(IncidentService incidentService, IncidentEvidenceService incidentEvidenceService, InvestigationService investigationService, IncidentAiClient incidentAiClient){
         this.incidentService = incidentService;
         this.incidentEvidenceService = incidentEvidenceService;
         this.investigationService = investigationService;
+        this.incidentAiClient = incidentAiClient;
 
     }
 
@@ -140,6 +143,20 @@ public ResponseEntity<InvestigationResult> analyzeIncident(
             investigationService.analyze(incidentId);
 
     return ResponseEntity.ok(result);
+}
+
+@PostMapping("/{incidentId}/agent")
+public ResponseEntity<String> runAgent(
+        @PathVariable Long incidentId,
+        @RequestBody String instruction) {
+
+    String agentInstruction =
+            "Incident ID: " + incidentId + "\n"
+            + "User instruction: " + instruction;
+
+    return ResponseEntity.ok(
+            incidentAiClient.runAgent(agentInstruction)
+    );
 }
 
 }
