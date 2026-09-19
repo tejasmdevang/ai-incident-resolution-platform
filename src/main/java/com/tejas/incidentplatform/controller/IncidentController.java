@@ -12,13 +12,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.tejas.incidentplatform.dto.PagedResponse;
 import com.tejas.incidentplatform.dto.UpdateIncidentStatusRequest;
+import com.tejas.incidentplatform.dto.InvestigationResult;
+import com.tejas.incidentplatform.service.InvestigationService;
+import com.tejas.incidentplatform.ai.IncidentAiClient;
+
 
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.tejas.incidentplatform.dto.IncidentEvidenceRequest;
 import com.tejas.incidentplatform.dto.IncidentRequest;
 import com.tejas.incidentplatform.dto.IncidentResponse;
+import com.tejas.incidentplatform.dto.InvestigationResult;
 import com.tejas.incidentplatform.entity.Incident;
+import com.tejas.incidentplatform.entity.IncidentEvidence;
+import com.tejas.incidentplatform.service.IncidentEvidenceService;
 import com.tejas.incidentplatform.service.IncidentService;
+import com.tejas.incidentplatform.service.InvestigationService;
 
 import io.micrometer.core.ipc.http.HttpSender.Response;
 
@@ -31,9 +40,15 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/incidents")
 public class IncidentController {
     private final IncidentService incidentService;
+    private final IncidentEvidenceService incidentEvidenceService;
+    private final InvestigationService investigationService;
+    private final IncidentAiClient incidentAiClient;
 
-    public IncidentController(IncidentService incidentService){
+    public IncidentController(IncidentService incidentService, IncidentEvidenceService incidentEvidenceService, InvestigationService investigationService, IncidentAiClient incidentAiClient){
         this.incidentService = incidentService;
+        this.incidentEvidenceService = incidentEvidenceService;
+        this.investigationService = investigationService;
+        this.incidentAiClient = incidentAiClient;
 
     }
 
@@ -105,6 +120,43 @@ public ResponseEntity<Void> deleteIncident(@PathVariable Long id) {
     return ResponseEntity.noContent().build();
 }
 
+@PostMapping("/{incidentId}/evidence")
+public ResponseEntity<IncidentEvidence> addEvidence(
+        @PathVariable Long incidentId,
+        @Valid @RequestBody IncidentEvidenceRequest request
+) {
 
+    IncidentEvidence evidence =
+            incidentEvidenceService.addEvidence(incidentId, request);
+
+    return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(evidence);
+}
+
+@PostMapping("/{incidentId}/analyze")
+public ResponseEntity<InvestigationResult> analyzeIncident(
+        @PathVariable Long incidentId
+) {
+
+    InvestigationResult result =
+            investigationService.analyze(incidentId);
+
+    return ResponseEntity.ok(result);
+}
+
+@PostMapping("/{incidentId}/agent")
+public ResponseEntity<String> runAgent(
+        @PathVariable Long incidentId,
+        @RequestBody String instruction) {
+
+    String agentInstruction =
+            "Incident ID: " + incidentId + "\n"
+            + "User instruction: " + instruction;
+
+    return ResponseEntity.ok(
+            incidentAiClient.runAgent(agentInstruction)
+    );
+}
 
 }
