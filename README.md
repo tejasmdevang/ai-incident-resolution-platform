@@ -43,6 +43,7 @@ flowchart TD
     AG --> TC[Spring AI Tool Calling]
     TC --> T[Controlled Incident Tools]
     T --> P
+```
     
 How the AI Investigation Works
 
