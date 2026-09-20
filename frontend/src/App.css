@@ -354,6 +354,33 @@ button:disabled {
   font-size: 14px;
 }
 
+.auth-switch {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-top: 16px;
+  font-size: 14px;
+  color: #667085;
+}
+
+.auth-switch-button {
+  width: auto;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  color: #2563eb;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-switch-button:hover {
+  background: transparent;
+  text-decoration: underline;
+}
+
 /* =========================
    RESPONSIVE
    ========================= */
@@ -400,29 +427,6 @@ button:disabled {
   .header-actions {
     flex-direction: row;
     align-items: center;
-  }
-  .auth-switch {
-    margin-top: 24px;
-    padding-top: 20px;
-    border-top: 1px solid #e5e7eb;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    color: #6b7280;
-  }
-  
-  .auth-switch-button {
-    padding: 0;
-    background: transparent;
-    color: #2563eb;
-    font-weight: 600;
-  }
-  
-  .auth-switch-button:hover:not(:disabled) {
-    background: transparent;
-    color: #1d4ed8;
   }
   
   .auth-success {
